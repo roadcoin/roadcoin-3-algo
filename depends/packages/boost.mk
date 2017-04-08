@@ -1,8 +1,9 @@
 package=boost
-$(package)_version=1_56_0
-$(package)_download_path=http://sourceforge.net/projects/boost/files/boost/1.56.0
+$(package)_version=1_59_0
+$(package)_download_path=http://sourceforge.net/projects/boost/files/boost/1.59.0
 $(package)_file_name=$(package)_$($(package)_version).tar.bz2
-$(package)_sha256_hash=134732acaf3a6e7eba85988118d943f0fa6b7f0850f65131fff89823ad30ff1d
+$(package)_sha256_hash=727a932322d94287b62abb1bd2d41723eec4356a7728909e38adb65ca25241ca
+$(package)_patches=fix-win-wake-from-sleep.patch
 
 define $(package)_set_vars
 $(package)_config_opts_release=variant=release
@@ -20,13 +21,13 @@ $(package)_archiver_$(host_os)=$($(package)_ar)
 $(package)_toolset_darwin=darwin
 $(package)_archiver_darwin=$($(package)_libtool)
 $(package)_config_libraries=chrono,filesystem,program_options,system,thread,test
-$(package)_cxxflags=-fvisibility=hidden
-$(package)_cxxflags_x86_64_linux=-fPIC
-$(package)_cxxflags_arm_linux=-fPIC
+$(package)_cxxflags=-std=c++11 -fvisibility=hidden
+$(package)_cxxflags_linux=-fPIC
 endef
 
 define $(package)_preprocess_cmds
- echo "using $(boost_toolset_$(host_os)) : : $($(package)_cxx) : <cxxflags>\"$($(package)_cxxflags) $($(package)_cppflags)\" <linkflags>\"$($(package)_ldflags)\" <archiver>\"$(boost_archiver_$(host_os))\" <striper>\"$(host_STRIP)\"  <ranlib>\"$(host_RANLIB)\" <rc>\"$(host_WINDRES)\" : ;" > user-config.jam
+  patch -p1 < $($(package)_patch_dir)/fix-win-wake-from-sleep.patch && \
+  echo "using $(boost_toolset_$(host_os)) : : $($(package)_cxx) : <cxxflags>\"$($(package)_cxxflags) $($(package)_cppflags)\" <linkflags>\"$($(package)_ldflags)\" <archiver>\"$(boost_archiver_$(host_os))\" <striper>\"$(host_STRIP)\"  <ranlib>\"$(host_RANLIB)\" <rc>\"$(host_WINDRES)\" : ;" > user-config.jam
 endef
 
 define $(package)_config_cmds
@@ -40,4 +41,3 @@ endef
 define $(package)_stage_cmds
   ./b2 -d0 -j4 --prefix=$($(package)_staging_prefix_dir) $($(package)_config_opts) install
 endef
-
