@@ -1,0 +1,7 @@
+Fork of Bitcoin v0.9.3
+
+Building Roadcoin
+
+See doc/build-*.md for instructions on building roadcoind,
+the intended-for-services, no-graphical-interface, reference
+implementation of Roadcoin.
